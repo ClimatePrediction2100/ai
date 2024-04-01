@@ -1,0 +1,9 @@
+torch
+jupyter
+ipykernel
+ipywidgets
+netCDF4
+numpy
+seaborn
+matplotlib
+gymnasium
