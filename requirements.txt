@@ -3,6 +3,7 @@ jupyter
 ipykernel
 ipywidgets
 netCDF4
+xarray
 numpy
 seaborn
 matplotlib
