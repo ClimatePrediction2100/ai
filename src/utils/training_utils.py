@@ -7,9 +7,8 @@ import tqdm
 
 import os
 import config
-from config import DEVICE as device
 
-def train_model(model, train_loader, test_loader, num_epochs, patience=10, criterion=nn.MSELoss(), optimizer=optim.Adam, learning_rate=0.001):
+def train_model(model, train_loader, test_loader, num_epochs, device, save_model=False, patience=10, criterion=nn.MSELoss(), optimizer=optim.Adam, learning_rate=0.001):
     # Train the model
     total_step = len(train_loader)
     
@@ -18,7 +17,8 @@ def train_model(model, train_loader, test_loader, num_epochs, patience=10, crite
     
     min_loss = float('inf')
     model_path = os.path.join(config.ROOT_DIR, 'models', f'{model}')
-    os.makedirs(model_path, exist_ok=True)  # Corrected from os.mkdir to os.makedirs
+    if save_model:
+        os.makedirs(model_path, exist_ok=True)  # Corrected from os.mkdir to os.makedirs
     
     epochs_no_improve = 0  # Counter to keep track of non-improving epochs
     
@@ -53,9 +53,10 @@ def train_model(model, train_loader, test_loader, num_epochs, patience=10, crite
         # Check if the loss improved
         if test_loss < min_loss:
             min_loss = test_loss
-            torch.save(model.state_dict(), os.path.join(model_path, 'best_model.pth'))
+            if save_model:
+                torch.save(model.state_dict(), os.path.join(model_path, 'best_model.pth')) 
             model_name = f'{model}_epoch_{epoch+1}'
-            print(f"Saved improved {model_name} with Test Loss: {test_loss}")
+            print(f"Improved {model_name} with Test Loss: {test_loss}")
             epochs_no_improve = 0  # Reset the counter
         else:
             epochs_no_improve += 1  # Increment the counter

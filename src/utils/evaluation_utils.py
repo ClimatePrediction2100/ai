@@ -4,8 +4,6 @@ import torch.optim as optim
 import numpy as np
 from matplotlib import pyplot as plt
 
-from config import DEVICE as device
-
 def evaluate_model(model, test_loader, device, plot=False, criterion=nn.MSELoss()):
     total_val_loss = 0
     count = 0
