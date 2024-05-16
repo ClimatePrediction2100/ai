@@ -10,6 +10,9 @@ DEVICE = torch.device('cuda' if torch.cuda.is_available() else 'mps' if torch.ba
 LEARNING_RATE = 0.001
 BATCH_SIZE = 32
 NUM_EPOCHS = 10
+NUM_LAYERS = 4
+HIDDEN_DIM = 512
+PATIENCE = 10
 
 # Feature settings, if any
 FEATURE_DIM = 128
