@@ -8,7 +8,7 @@ temperature_path = os.path.join(ROOT_DIR, 'data', 'raw', 'globalTemperature', 'L
 co2_path = os.path.join(ROOT_DIR, 'data', 'raw', 'globalGhgEmissions', 'CO2_1deg_month_1850-2013.nc')
 
 # ssp_scenario = 'SSP119', 'SSP126', 'SSP245', 'SSP370', 'SSP434', 'SSP460', 'SSP534', 'SSP585'
-def data_loader(ssp_scenario='SSP119'):
+def DataLoader(ssp_scenario='SSP119'):
     temperature_ds = xr.open_dataset(temperature_path)
     co2_ds = xr.open_dataset(co2_path)
 
