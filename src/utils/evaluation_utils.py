@@ -6,7 +6,7 @@ from matplotlib import pyplot as plt
 
 from config import DEVICE as device
 
-def evaluate_model(model, test_loader, criterion=nn.MSELoss()):
+def evaluate_model(model, test_loader, device, plot=False, criterion=nn.MSELoss()):
     total_val_loss = 0
     count = 0
     actual = []
@@ -25,20 +25,25 @@ def evaluate_model(model, test_loader, criterion=nn.MSELoss()):
             actual.extend(yb.tolist())
             predicted.extend(val_outputs.squeeze().tolist())
 
-    avg_val_loss = total_val_loss / count
-    print(f'Test Loss {avg_val_loss}')
-    print(f'Actual mean: {np.mean(actual)}, Predicted mean: {np.mean(predicted)}')
+    avg_test_loss = total_val_loss / count
+    actual_mean = np.mean(actual)
+    predicted_mean = np.mean(predicted)
+    print(f'Test Loss {avg_test_loss}')
+    print(f'Actual mean: {actual_mean}, Predicted mean: {predicted_mean}')
 
     # Limit the data points to the first 100 for visualization
     actual = actual[200:260]
     predicted = predicted[200:260]
 
     # Plotting
-    plt.figure(figsize=(10, 6))
-    plt.plot(actual, label='Actual Data', color='blue')
-    plt.plot(predicted, label='Predicted Data', color='red')
-    plt.title('Comparison of Actual and Predicted Values for First 100 Time Steps')
-    plt.xlabel('Time Steps')
-    plt.ylabel('Temperature (Normalized)')
-    plt.legend()
-    plt.show()
+    if plot:
+        plt.figure(figsize=(10, 6))
+        plt.plot(actual, label='Actual Data', color='blue')
+        plt.plot(predicted, label='Predicted Data', color='red')
+        plt.title('Comparison of Actual and Predicted Values for First 100 Time Steps')
+        plt.xlabel('Time Steps')
+        plt.ylabel('Temperature (Normalized)')
+        plt.legend()
+        plt.show()
+    
+    return avg_test_loss, actual_mean, predicted_mean
