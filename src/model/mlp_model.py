@@ -3,23 +3,30 @@ import torch.nn as nn
 
 
 class MLPModel(nn.Module):
-    def __init__(self, input_dim, hidden_dim, output_size=1):
+    def __init__(self, input_dim, hidden_dim, num_layers, output_size=1):
         super(MLPModel, self).__init__()
-        self.hidden_dim = hidden_dim
-        self.fc1 = nn.Linear(input_dim, hidden_dim)
-        self.fc2 = nn.Linear(hidden_dim, hidden_dim)
-        self.fc3 = nn.Linear(hidden_dim, hidden_dim)
-        self.fc4 = nn.Linear(hidden_dim, output_size)
+        
+        # Initialize layers using ModuleList
+        self.layers = nn.ModuleList()
+        
+        # First layer from input dimension to the first hidden dimension
+        self.layers.append(nn.Linear(input_dim, hidden_dim))
+        
+        # Add hidden layers based on num_layers
+        for _ in range(1, num_layers):
+            self.layers.append(nn.Linear(hidden_dim, hidden_dim))
+        
+        # Output layer
+        self.layers.append(nn.Linear(hidden_dim, output_size))
 
     def forward(self, x):
         # Flatten the input
         x = x.view(x.size(0), -1)
-
-        # Forward pass through the first fully connected layer
-        x = torch.relu(self.fc1(x))
-        x = torch.relu(self.fc2(x))
-        x = torch.relu(self.fc3(x))
-
-        # Forward pass through the second fully connected layer
-        x = self.fc4(x)
+        
+        # Pass through all hidden layers with ReLU activation, except the last layer
+        for layer in self.layers[:-1]:
+            x = torch.relu(layer(x))
+        
+        # No activation for the last layer (output layer)
+        x = self.layers[-1](x)
         return x
