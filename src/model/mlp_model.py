@@ -3,7 +3,7 @@ import torch.nn as nn
 
 
 class MLPModel(nn.Module):
-    def __init__(self, input_dim, hidden_dim, output_size):
+    def __init__(self, input_dim, hidden_dim, output_size=1):
         super(MLPModel, self).__init__()
         self.hidden_dim = hidden_dim
         self.fc1 = nn.Linear(input_dim, hidden_dim)

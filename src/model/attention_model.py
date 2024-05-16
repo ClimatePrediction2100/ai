@@ -6,7 +6,7 @@ from config import DEVICE as device
 
 
 class AttentionModel(nn.Module):
-    def __init__(self, input_dim, hidden_dim, num_layers, output_size):
+    def __init__(self, input_dim, hidden_dim, num_layers, output_size=1):
         super(AttentionModel, self).__init__()
         self.hidden_dim = hidden_dim
         self.num_layers = num_layers
