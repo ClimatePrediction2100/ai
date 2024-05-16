@@ -1,0 +1,9 @@
+torch
+torchvision
+torchtext
+xarray
+numpy
+pandas
+matplotlib
+tqdm
+netcdf4
