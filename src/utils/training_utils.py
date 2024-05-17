@@ -1,10 +1,7 @@
 import torch
 import torch.nn as nn
 import torch.optim as optim
-import numpy as np
-from matplotlib import pyplot as plt
-import tqdm
-
+from tqdm import tqdm
 import os
 import config
 
@@ -17,10 +14,12 @@ def train_model(model, train_loader, test_loader, num_epochs, device, save_model
     
     min_loss = float('inf')
     model_path = os.path.join(config.ROOT_DIR, 'models', f'{model}')
-    if save_model:
-        os.makedirs(model_path, exist_ok=True)  # Corrected from os.mkdir to os.makedirs
+    best_model_state = None  # To store the state of the best model
     
-    epochs_no_improve = 0  # Counter to keep track of non-improving epochs
+    if save_model:
+        os.makedirs(model_path, exist_ok=True)
+    
+    epochs_no_improve = 0
     
     for epoch in tqdm(range(num_epochs)):
         model.train()
@@ -53,17 +52,21 @@ def train_model(model, train_loader, test_loader, num_epochs, device, save_model
         # Check if the loss improved
         if test_loss < min_loss:
             min_loss = test_loss
+            best_model_state = model.state_dict()  # Save the best model state
             if save_model:
-                torch.save(model.state_dict(), os.path.join(model_path, 'best_model.pth')) 
+                torch.save(best_model_state, os.path.join(model_path, 'best_model.pth'))
             model_name = f'{model}_epoch_{epoch+1}'
             print(f"Improved {model_name} with Test Loss: {test_loss}")
-            epochs_no_improve = 0  # Reset the counter
+            epochs_no_improve = 0
         else:
-            epochs_no_improve += 1  # Increment the counter
+            epochs_no_improve += 1
         
-        # Early stopping check
         if epochs_no_improve >= patience:
             print(f"Stopping training early - no improvement in {patience} epochs.")
             break
-
+    
+    # Restore the best model before returning
+    if best_model_state:
+        model.load_state_dict(best_model_state)
+    
     return model
