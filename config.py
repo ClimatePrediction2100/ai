@@ -12,10 +12,13 @@ BATCH_SIZE = 32
 NUM_EPOCHS = 10
 NUM_LAYERS = 4
 HIDDEN_DIM = 512
+LOSS = 'mse'
 PATIENCE = 10
+SEQUENCE_LENGTH = 12
 
-# Feature settings, if any
-FEATURE_DIM = 128
+# Save results
+expr_name = 'experiment_1'
+
 
 # Logging settings
 LOGGING_CONFIG = {

@@ -69,7 +69,7 @@ class TrainData(Dataset):
         self.time_steps = data_dict['time_length'] - seq_length + 1
 
     def __len__(self):
-        return 9000  # Randomly chosen number
+        return 10000  # Randomly chosen number
 
     def __getitem__(self, index):
         while True:
