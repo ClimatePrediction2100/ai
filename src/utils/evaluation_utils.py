@@ -5,7 +5,7 @@ import numpy as np
 from matplotlib import pyplot as plt
 
 def evaluate_model(model, test_loader, device, plot=False, criterion=nn.MSELoss()):
-    total_val_loss = 0
+    total_test_loss = 0
     count = 0
     actual = []
     predicted = []
@@ -17,13 +17,13 @@ def evaluate_model(model, test_loader, device, plot=False, criterion=nn.MSELoss(
             val_outputs = model(xb)
             val_outputs = val_outputs.squeeze()  # Adjust output shape if necessary
             batch_loss = criterion(val_outputs, yb)
-            total_val_loss += batch_loss.item()
+            total_test_loss += batch_loss.item()
             count += 1
             
             actual.extend(yb.tolist())
             predicted.extend(val_outputs.squeeze().tolist())
 
-    avg_test_loss = total_val_loss / count
+    avg_test_loss = total_test_loss / count
     actual_mean = np.mean(actual)
     predicted_mean = np.mean(predicted)
     print(f'Test Loss {avg_test_loss}')
