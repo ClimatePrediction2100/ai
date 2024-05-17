@@ -5,3 +5,4 @@ expr:
 
 setup:
 	@pip install -r requirements.txt
+	@mkdir results
