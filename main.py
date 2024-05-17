@@ -41,7 +41,7 @@ def train(train_data, test_data, args):
     elif model == "rnn":
         model = RNNModel(input_dim=feature_dim, hidden_dim=args.hidden_dim, num_layers=args.num_layers)
     elif model == "mlp":
-        model = MLPModel(input_dim=feature_dim, hidden_dim=args.hidden_dim, num_layers=args.num_layers)
+        model = MLPModel(input_dim=feature_dim*args.seq_length, hidden_dim=args.hidden_dim, num_layers=args.num_layers)
     elif model == "attn":
         model = AttentionModel(input_dim=feature_dim, hidden_dim=args.hidden_dim, num_layers=args.num_layers)
     
@@ -77,7 +77,7 @@ def expr(train_data, test_data, args):
     elif args.model == "rnn":
         model = RNNModel(input_dim=feature_dim, hidden_dim=args.hidden_dim, num_layers=args.num_layers)
     elif args.model == "mlp":
-        model = MLPModel(input_dim=feature_dim, hidden_dim=args.hidden_dim, num_layers=args.num_layers)
+        model = MLPModel(input_dim=feature_dim*args.seq_length, hidden_dim=args.hidden_dim, num_layers=args.num_layers)
     elif args.model == "attn":
         model = AttentionModel(input_dim=feature_dim, hidden_dim=args.hidden_dim, num_layers=args.num_layers)
     

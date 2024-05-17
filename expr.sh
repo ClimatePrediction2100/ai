@@ -1,25 +1,25 @@
 #!/bin/bash
 
 # Define arrays for each hyperparameter
-models=("lstm" "rnn" "gru" "mlp" "attn")
-num_layers=(2 4)
-hidden_dims=(100 200)
-loss_functions=("mse" "mae" "huber")
-batch_sizes=(12)  # Add your specific batch size values
-epochs=(40)
-patiences=(10)
-learning_rates=(0.01 0.001 0.0001)
-seq_lengths=(12 24 48 96)
-
-# models=("lstm" "rnn")
-# num_layers=(1)
-# hidden_dims=(50)
-# loss_functions=("mse")
-# batch_sizes=(16)  # Add your specific batch size values
-# epochs=(2)
+# models=("lstm" "rnn" "gru" "mlp" "attn")
+# num_layers=(2 4)
+# hidden_dims=(100 200)
+# loss_functions=("mse" "mae" "huber")
+# batch_sizes=(12)  # Add your specific batch size values
+# epochs=(40)
 # patiences=(10)
-# learning_rates=(0.01)
-# seq_lengths=(12)
+# learning_rates=(0.01 0.001 0.0001)
+# seq_lengths=(12 24 48 96)
+
+models=("mlp")
+num_layers=(1)
+hidden_dims=(50)
+loss_functions=("mse")
+batch_sizes=(16)  # Add your specific batch size values
+epochs=(2)
+patiences=(10)
+learning_rates=(0.01)
+seq_lengths=(12)
 
 # Calculate total number of experiments
 total_experiments=$((${#models[@]} * ${#num_layers[@]} * ${#hidden_dims[@]} * ${#loss_functions[@]} * ${#batch_sizes[@]} * ${#epochs[@]} * ${#learning_rates[@]} * ${#seq_lengths[@]} * ${#patiences[@]}))

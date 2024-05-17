@@ -6,12 +6,12 @@ from config import DEVICE as device
 
 
 class AttentionModel(nn.Module):
-    def __init__(self, input_dim, hidden_dim, num_layers, output_size=1):
+    def __init__(self, input_dim, hidden_dim, num_layers, output_dim=1):
         super(AttentionModel, self).__init__()
         self.hidden_dim = hidden_dim
         self.num_layers = num_layers
         self.lstm = nn.LSTM(input_dim, hidden_dim, num_layers, batch_first=True)
-        self.fc = nn.Linear(hidden_dim, output_size)
+        self.fc = nn.Linear(hidden_dim, output_dim)
         self.attn = nn.Linear(hidden_dim, hidden_dim)
         self.v = nn.Parameter(torch.rand(hidden_dim))
         stdv = 1.0 / math.sqrt(self.v.size(0))
@@ -37,4 +37,7 @@ class AttentionModel(nn.Module):
 
         # Pass the context to the fully connected layer
         out = self.fc(context)
+        
+        # Squeeze the output to remove the last dimension if it's one
+        out = out.squeeze(-1)
         return out
