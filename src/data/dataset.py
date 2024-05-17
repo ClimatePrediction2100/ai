@@ -3,6 +3,21 @@ from torch.utils.data import Dataset
 import random
 import numpy as np
 
+def convert_months():
+    if not hasattr(convert_months, "cos_months") or not hasattr(convert_months, "sin_months"):
+        # Compute only once
+        angles = 2 * np.pi * np.arange(12) / 12
+        convert_months.cos_months = np.cos(angles)
+        convert_months.sin_months = np.sin(angles)
+
+    def computation(months):
+        months = np.array(months) % 12
+        cos_values = convert_months.cos_months[months]
+        sin_values = convert_months.sin_months[months]
+        return cos_values, sin_values
+
+    return computation
+
 class TestData(Dataset):
     def __init__(self, data_dict, seq_length):
         """
@@ -18,6 +33,7 @@ class TestData(Dataset):
         self.longitudes = data_dict['land_mask']['longitude'].values
         
         self.time_steps = data_dict['time_length'] - seq_length + 1
+        self.month_converter = convert_months()
 
     def __len__(self):
         return 1000  # Randomly chosen number
@@ -25,32 +41,29 @@ class TestData(Dataset):
     def __getitem__(self, index):
         while True:
             # Randomly select a location
-            lat = random.choice(self.latitudes)
-            lon = random.choice(self.longitudes)
+            lat_idx = random.randint(0, 179)
+            lon_idx = random.randint(0, 359)
             start_time = random.randint(0, self.time_steps - 1)  # Randomly select a starting time step
 
-            temperature_sequence = self.data_dict['temperature'].sel(latitude=lat, longitude=lon, method="nearest").values
+            temperature_sequence = self.data_dict['temperature'].isel(latitude=lat_idx, longitude=lon_idx).values
+            
+            x_temp = temperature_sequence[start_time:start_time + self.seq_length]
+            y = temperature_sequence[start_time + self.seq_length]
             
             #check NaN values
-            if np.isnan(temperature_sequence).any():
+            if np.isnan(x_temp).any() or np.isnan(y):
                 continue
             
-            co2_sequence = self.data_dict['co2'].sel(latitude=lat, longitude=lon, method="nearest").values
-            
-            land_mask = self.data_dict['land_mask'].sel(latitude=lat, longitude=lon, method="nearest").values.item()  # Get scalar value
-            lat_norm = lat / 90
-
-            months = [(start_time + i) % 12 for i in range(self.seq_length + 1)]  # Calculate month for each timestep
-            cos_months = [np.cos(2 * np.pi * month / 12) for month in months]
-            sin_months = [np.sin(2 * np.pi * month / 12) for month in months]
-
-            x_temp = temperature_sequence[start_time:start_time + self.seq_length]
+            co2_sequence = self.data_dict['co2'].isel(latitude=lat_idx, longitude=lon_idx).values
             x_co2 = co2_sequence[start_time:start_time + self.seq_length]
             x_combined = list(zip(x_temp, x_co2))
             
-            y = temperature_sequence[start_time + self.seq_length]
+            land_mask = self.data_dict['land_mask'].isel(latitude=lat_idx, longitude=lon_idx).values.item()  # Get scalar value
+            lat_norm = (lat_idx - 89.5) / 90
 
-            # if not np.isnan(x_temp).any() and not np.isnan(y):
+            months = np.arange(start_time, start_time + self.seq_length)
+            cos_months, sin_months = self.month_converter(months)
+
             # Prepare input features for each timestep
             x_features = [np.append(np.array([temp[0], temp[1]]), [land_mask, lat_norm, cos_months[i], sin_months[i]]) for i, temp in enumerate(x_combined)]
             x_concat = np.stack(x_features)  # Stack to form a 2D array where each row is a timestep
@@ -72,6 +85,8 @@ class TrainData(Dataset):
         self.longitudes = data_dict['land_mask']['longitude'].values
         
         self.time_steps = data_dict['time_length'] - seq_length + 1
+        self.month_converter = convert_months()
+        
 
     def __len__(self):
         return 10000  # Randomly chosen number
@@ -79,32 +94,29 @@ class TrainData(Dataset):
     def __getitem__(self, index):
         while True:
             # Randomly select a location
-            lat = random.choice(self.latitudes)
-            lon = random.choice(self.longitudes)
-            start_time = random.randint(0, self.time_steps - 1)  # Randomly select a starting time step
+            lat_idx = random.randint(0, 179)
+            lon_idx = random.randint(0, 359)
+            start_time = random.randint(1300, self.time_steps - 1)  # Randomly select a starting time step
 
-            temperature_sequence = self.data_dict['temperature'].sel(latitude=lat, longitude=lon, method="nearest").values
+            temperature_sequence = self.data_dict['temperature'].isel(latitude=lat_idx, longitude=lon_idx).values
+            
+            x_temp = temperature_sequence[start_time:start_time + self.seq_length]
+            y = temperature_sequence[start_time + self.seq_length]
             
             #check NaN values
-            if np.isnan(temperature_sequence).any():
+            if np.isnan(x_temp).any() or np.isnan(y):
                 continue
             
-            co2_sequence = self.data_dict['co2'].sel(LatDim=int(89.5 - lat), LonDim=int(179.5 - lon)).values
-            
-            land_mask = self.data_dict['land_mask'].sel(latitude=lat, longitude=lon, method="nearest").values.item()  # Get scalar value
-            lat_norm = lat / 90
-
-            months = [(start_time + i) % 12 for i in range(self.seq_length + 1)]  # Calculate month for each timestep
-            cos_months = [np.cos(2 * np.pi * month / 12) for month in months]
-            sin_months = [np.sin(2 * np.pi * month / 12) for month in months]
-
-            x_temp = temperature_sequence[start_time:start_time + self.seq_length]
+            co2_sequence = self.data_dict['co2'].isel(LatDim=179-lat_idx, LonDim=359-lon_idx).values
             x_co2 = co2_sequence[start_time:start_time + self.seq_length]
             x_combined = list(zip(x_temp, x_co2))
             
-            y = temperature_sequence[start_time + self.seq_length]
+            land_mask = self.data_dict['land_mask'].isel(latitude=lat_idx, longitude=lon_idx).values.item()  # Get scalar value
+            lat_norm = (lat_idx - 89.5) / 90
+            
+            months = np.arange(start_time, start_time + self.seq_length)
+            cos_months, sin_months = self.month_converter(months)
 
-            # if not np.isnan(x_temp).any() and not np.isnan(y):
             # Prepare input features for each timestep
             x_features = [np.append(np.array([temp[0], temp[1]]), [land_mask, lat_norm, cos_months[i], sin_months[i]]) for i, temp in enumerate(x_combined)]
             x_concat = np.stack(x_features)  # Stack to form a 2D array where each row is a timestep
