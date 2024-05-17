@@ -30,6 +30,11 @@ class TestData(Dataset):
             start_time = random.randint(0, self.time_steps - 1)  # Randomly select a starting time step
 
             temperature_sequence = self.data_dict['temperature'].sel(latitude=lat, longitude=lon, method="nearest").values
+            
+            #check NaN values
+            if np.isnan(temperature_sequence).any():
+                continue
+            
             co2_sequence = self.data_dict['co2'].sel(latitude=lat, longitude=lon, method="nearest").values
             
             land_mask = self.data_dict['land_mask'].sel(latitude=lat, longitude=lon, method="nearest").values.item()  # Get scalar value
@@ -45,12 +50,12 @@ class TestData(Dataset):
             
             y = temperature_sequence[start_time + self.seq_length]
 
-            if not np.isnan(x_temp).any() and not np.isnan(y):
-                # Prepare input features for each timestep
-                x_features = [np.append(np.array([temp[0], temp[1]]), [land_mask, lat_norm, cos_months[i], sin_months[i]]) for i, temp in enumerate(x_combined)]
-                x_concat = np.stack(x_features)  # Stack to form a 2D array where each row is a timestep
-                
-                return torch.tensor(x_concat, dtype=torch.float32), torch.tensor(y, dtype=torch.float32)
+            # if not np.isnan(x_temp).any() and not np.isnan(y):
+            # Prepare input features for each timestep
+            x_features = [np.append(np.array([temp[0], temp[1]]), [land_mask, lat_norm, cos_months[i], sin_months[i]]) for i, temp in enumerate(x_combined)]
+            x_concat = np.stack(x_features)  # Stack to form a 2D array where each row is a timestep
+            
+            return torch.tensor(x_concat, dtype=torch.float32), torch.tensor(y, dtype=torch.float32)
 
 class TrainData(Dataset):
     def __init__(self, data_dict, seq_length):
@@ -79,6 +84,11 @@ class TrainData(Dataset):
             start_time = random.randint(0, self.time_steps - 1)  # Randomly select a starting time step
 
             temperature_sequence = self.data_dict['temperature'].sel(latitude=lat, longitude=lon, method="nearest").values
+            
+            #check NaN values
+            if np.isnan(temperature_sequence).any():
+                continue
+            
             co2_sequence = self.data_dict['co2'].sel(LatDim=int(89.5 - lat), LonDim=int(179.5 - lon)).values
             
             land_mask = self.data_dict['land_mask'].sel(latitude=lat, longitude=lon, method="nearest").values.item()  # Get scalar value
@@ -94,9 +104,9 @@ class TrainData(Dataset):
             
             y = temperature_sequence[start_time + self.seq_length]
 
-            if not np.isnan(x_temp).any() and not np.isnan(y):
-                # Prepare input features for each timestep
-                x_features = [np.append(np.array([temp[0], temp[1]]), [land_mask, lat_norm, cos_months[i], sin_months[i]]) for i, temp in enumerate(x_combined)]
-                x_concat = np.stack(x_features)  # Stack to form a 2D array where each row is a timestep
-                
-                return torch.tensor(x_concat, dtype=torch.float32), torch.tensor(y, dtype=torch.float32)
+            # if not np.isnan(x_temp).any() and not np.isnan(y):
+            # Prepare input features for each timestep
+            x_features = [np.append(np.array([temp[0], temp[1]]), [land_mask, lat_norm, cos_months[i], sin_months[i]]) for i, temp in enumerate(x_combined)]
+            x_concat = np.stack(x_features)  # Stack to form a 2D array where each row is a timestep
+            
+            return torch.tensor(x_concat, dtype=torch.float32), torch.tensor(y, dtype=torch.float32)
