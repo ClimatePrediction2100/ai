@@ -5,6 +5,7 @@ ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 
 # Set the device to use for tensor computations
 DEVICE = torch.device('cuda' if torch.cuda.is_available() else 'mps' if torch.backends.mps.is_available() else 'cpu')
+NUM_WORKERS = 16 if DEVICE == 'cuda' else 8 if DEVICE == 'mps' else 0
 
 # Model settings
 LEARNING_RATE = 0.001

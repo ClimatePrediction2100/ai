@@ -3,20 +3,16 @@ from torch.utils.data import Dataset
 import random
 import numpy as np
 
-def convert_months():
-    if not hasattr(convert_months, "cos_months") or not hasattr(convert_months, "sin_months"):
-        # Compute only once
-        angles = 2 * np.pi * np.arange(12) / 12
-        convert_months.cos_months = np.cos(angles)
-        convert_months.sin_months = np.sin(angles)
+# Precompute cos and sin values
+angles = 2 * np.pi * np.arange(12) / 12
+cos_months = np.cos(angles)
+sin_months = np.sin(angles)
 
-    def computation(months):
-        months = np.array(months) % 12
-        cos_values = convert_months.cos_months[months]
-        sin_values = convert_months.sin_months[months]
-        return cos_values, sin_values
-
-    return computation
+def convert_months(months):
+    months = np.array(months) % 12
+    cos_values = cos_months[months]
+    sin_values = sin_months[months]
+    return cos_values, sin_values
 
 class TestData(Dataset):
     def __init__(self, data_dict, seq_length):
@@ -33,7 +29,7 @@ class TestData(Dataset):
         self.longitudes = data_dict['land_mask']['longitude'].values
         
         self.time_steps = data_dict['time_length'] - seq_length + 1
-        self.month_converter = convert_months()
+        # self.month_converter = convert_months()
 
     def __len__(self):
         return 1000  # Randomly chosen number
@@ -62,7 +58,7 @@ class TestData(Dataset):
             lat_norm = (lat_idx - 89.5) / 90
 
             months = np.arange(start_time, start_time + self.seq_length)
-            cos_months, sin_months = self.month_converter(months)
+            cos_months, sin_months = convert_months(months)
 
             # Prepare input features for each timestep
             x_features = [np.append(np.array([temp[0], temp[1]]), [land_mask, lat_norm, cos_months[i], sin_months[i]]) for i, temp in enumerate(x_combined)]
@@ -85,7 +81,7 @@ class TrainData(Dataset):
         self.longitudes = data_dict['land_mask']['longitude'].values
         
         self.time_steps = data_dict['time_length'] - seq_length + 1
-        self.month_converter = convert_months()
+        # self.month_converter = convert_months()
         
 
     def __len__(self):
@@ -115,7 +111,7 @@ class TrainData(Dataset):
             lat_norm = (lat_idx - 89.5) / 90
             
             months = np.arange(start_time, start_time + self.seq_length)
-            cos_months, sin_months = self.month_converter(months)
+            cos_months, sin_months = convert_months(months)
 
             # Prepare input features for each timestep
             x_features = [np.append(np.array([temp[0], temp[1]]), [land_mask, lat_norm, cos_months[i], sin_months[i]]) for i, temp in enumerate(x_combined)]

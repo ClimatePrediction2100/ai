@@ -5,17 +5,17 @@
 # num_layers=(2 4)
 # hidden_dims=(100 200)
 # loss_functions=("mse" "mae" "huber")
-# batch_sizes=(12)  # Add your specific batch size values
+# batch_sizes=(128)  # Add your specific batch size values
 # epochs=(40)
 # patiences=(10)
-# learning_rates=(0.01 0.001 0.0001)
-# seq_lengths=(12 24 48 96)
+# learning_rates=(0.01 0.001)
+# seq_lengths=(12 24 48)
 
 models=("mlp")
 num_layers=(1)
 hidden_dims=(50)
 loss_functions=("mse")
-batch_sizes=(16)  # Add your specific batch size values
+batch_sizes=(32)  # Add your specific batch size values
 epochs=(2)
 patiences=(10)
 learning_rates=(0.01)

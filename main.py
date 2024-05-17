@@ -28,8 +28,8 @@ def train(train_data, test_data, args):
     train_dataset = TrainData(train_data, args.seq_length)
     test_dataset = TestData(test_data, args.seq_length)
     
-    train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=args.batch_size, shuffle=False)
-    test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=args.batch_size, shuffle=False)
+    train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=args.batch_size, shuffle=False, num_workers=config.NUM_WORKERS)
+    test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=args.batch_size, shuffle=False, num_workers=config.NUM_WORKERS)
     
     feature_dim = train_dataset[0][0].shape[1]
     
@@ -64,8 +64,8 @@ def expr(train_data, test_data, args):
     train_dataset = TrainData(train_data, args.seq_length)
     test_dataset = TestData(test_data, args.seq_length)
     
-    train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=args.batch_size, shuffle=False)
-    test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=args.batch_size, shuffle=False)
+    train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=args.batch_size, shuffle=False, num_workers=config.NUM_WORKERS)
+    test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=args.batch_size, shuffle=False, num_workers=config.NUM_WORKERS)
     
     feature_dim = train_dataset[0][0].shape[1]
     
@@ -113,7 +113,7 @@ def evaluate(test_data, args, model):
     print("Evaluating the model")
     
     test_dataset = TestData(test_data, args.seq_length)
-    test_loader = DataLoader(test_dataset, batch_size=args.batch_size, shuffle=False)
+    test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=args.batch_size, shuffle=False, num_workers=config.NUM_WORKERS)
     
     if args.loss == "mse":
         criterion = nn.MSELoss()
