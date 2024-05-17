@@ -103,6 +103,8 @@ def expr(train_data, test_data, args):
         "hidden_dim": args.hidden_dim,
         "avg_loss": avg_loss,
         "learning_rate": args.lr,
+        "loss": args.loss,
+        "batch_size": args.batch_size,
         "seq_length": args.seq_length,
         "actual_mean": actual_mean,
         "predicted_mean": predicted_mean
