@@ -37,7 +37,7 @@ for model in "${models[@]}"; do
                                 for patience in "${patiences[@]}"; do
                                     ((counter++))
                                     echo "Running trial $counter/$total_experiments with model=$model, num_layers=$num_layer, hidden_dim=$hidden_dim, loss=$loss, batch_size=$batch_size, epoch=$epoch, lr=$lr, seq_length=$seq_length, patience=$patience"
-                                    python main.py "expr" --model $model --num_layers $num_layer --hidden_dim $hidden_dim --loss $loss --batch_size $batch_size --epoch $epoch --lr $lr --seq_length $seq_length --patience $patience --save_model
+                                    python main.py "expr" --model $model --num_layers $num_layer --hidden_dim $hidden_dim --loss $loss --batch_size $batch_size --epoch $epoch --lr $lr --seq_length $seq_length --patience $patience
                                 done
                             done
                         done
