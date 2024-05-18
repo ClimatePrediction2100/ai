@@ -28,8 +28,8 @@ def train_model(
     model_path = os.path.join(config.ROOT_DIR, "models", f"{model}")
     best_model_state = None  # To store the state of the best model
 
-    if save_model:
-        os.makedirs(model_path, exist_ok=True)
+    # if save_model:
+    #     os.makedirs(model_path, exist_ok=True)
 
     epochs_no_improve = 0
 
@@ -67,8 +67,8 @@ def train_model(
         if test_loss < min_loss:
             min_loss = test_loss
             best_model_state = model.state_dict()  # Save the best model state
-            if save_model:
-                torch.save(best_model_state, os.path.join(model_path, "best_model.pth"))
+            # if save_model:
+            #     torch.save(best_model_state, os.path.join(model_path, "best_model.pth"))
             model_name = f"{model}_epoch_{epoch+1}"
             print(f"Improved {model_name} with Test Loss: {test_loss}")
             epochs_no_improve = 0
