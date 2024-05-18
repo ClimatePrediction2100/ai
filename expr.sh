@@ -1,6 +1,6 @@
 #!/bin/bash
 
-Define arrays for each hyperparameter
+# Define arrays for each hyperparameter
 models=("lstm" "rnn" "gru" "mlp" "attn")
 num_layers=(2 4 6)
 hidden_dims=(100 200)
