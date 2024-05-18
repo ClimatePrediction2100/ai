@@ -110,6 +110,10 @@ def expr(train_data, test_data, args):
         "predicted_mean": predicted_mean
     }
     log_results(results)
+    
+    if args.save_model:
+        model_name = f"{args.model}_{args.num_layers}_{args.hidden_dim}_{args.lr}_{args.loss}_{args.batch_size}_{args.seq_length}" 
+        torch.save(model.state_dict(), os.path.join(config.ROOT_DIR, "results", "models", f"{model_name}.pt"))
 
 def evaluate(test_data, args, model):
     print("Evaluating the model")
