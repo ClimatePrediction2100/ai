@@ -60,7 +60,7 @@ def train_model(
         test_loss /= len(test_loader)
 
         print(
-            f"Epoch {epoch+1}/{num_epochs}, Train Loss: {train_loss}, Train Loss: {test_loss}"
+            f"Epoch {epoch+1}/{num_epochs}, Train Loss: {train_loss}, Test Loss: {test_loss}"
         )
 
         # Check if the loss improved
