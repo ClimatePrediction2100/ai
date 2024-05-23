@@ -48,7 +48,7 @@ def initialize_netcdf_with_historical_data(source_file_path, new_file_path):
     
     return new_file_path  # Return the path for the new file
 
-def get_input_data(year, month, lat_index, lon_index, data_dict, nc_file, seq_length=48):
+def get_input_data(year, month, lat_index, lon_index, data_dict, nc_file, seq_length=12):
     lat = data_dict['land_mask']['latitude'].values[lat_index]
     lon = data_dict['land_mask']['longitude'].values[lon_index]
     
@@ -79,7 +79,7 @@ def get_input_data(year, month, lat_index, lon_index, data_dict, nc_file, seq_le
     
 from tqdm import tqdm
 
-def predict_and_update_nc_monthly(model, nc_dataset_path, device, predict_data_dict, start_year=2024, end_year=2150):
+def predict_and_update_nc_monthly(model, nc_dataset_path, device, predict_data_dict, seq_length, start_year=2024, end_year=2150):
     # Open the netCDF dataset
     nc_file = nc.Dataset(nc_dataset_path, 'r+')
 
@@ -93,7 +93,7 @@ def predict_and_update_nc_monthly(model, nc_dataset_path, device, predict_data_d
             for lat in tqdm(range(180), desc=f"Processing Year {year}, Month {month}"):
                 # Nested tqdm for longitude, you can also remove this if it's too verbose
                 for lon in tqdm(range(360), desc="Longitude", leave=False):
-                    input_data = get_input_data(year, month, lat, lon, predict_data_dict, nc_file)
+                    input_data = get_input_data(year, month, lat, lon, predict_data_dict, nc_file, seq_length)
                     input_tensor = torch.tensor(input_data, dtype=torch.float32).unsqueeze(0).to(device)
                     
                     with torch.no_grad():
