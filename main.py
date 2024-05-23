@@ -13,11 +13,21 @@ from src.data.data_loader import load_data  # Assuming data_loader is a function
 from src.data.dataset import *
 from src.utils.training_utils import *
 from src.utils.evaluation_utils import *
+from src.utils.prediction_utils import *
 
 
-    
 def predict(predict_data, args):
+    source_file_path = "data/raw/globalTemperature/Land_and_Ocean_LatLong1.nc"
+    new_file_path = "results/globalTemperature/temperature.nc"
+    initialize_netcdf_with_historical_data(source_file_path=source_file_path, new_file_path=new_file_path)
     print("Making predictions")
+    
+    model = LSTMModel(input_dim=6, hidden_dim=100, num_layers=2)
+    model.to(config.DEVICE)
+    model.load_state_dict(torch.load("lstm_2_100_0.001_huber_4096_48.pt", map_location=config.DEVICE))
+    model.eval()
+    predict_and_update_nc_monthly(model, new_file_path, config.DEVICE, predict_data, start_year=2024, end_year=2049)
+    
 
 def main():
     parser = argparse.ArgumentParser(description="Run ML tasks such as training, evaluating, or predicting.")
@@ -49,7 +59,7 @@ def main():
     elif args.task == "evaluate":
         evaluate()
     elif args.task == "predict":
-        predict()
+        predict(predict_data, args)
     else:
         print("Invalid task. Please choose from 'train', 'evaluate', 'expr' or 'predict'.")
 
