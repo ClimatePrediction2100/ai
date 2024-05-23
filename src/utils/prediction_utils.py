@@ -31,7 +31,7 @@ def initialize_netcdf_with_historical_data(source_file_path, new_file_path):
 
     # Assuming the original file starts from 2015 and each month is sequentially stored
     num_months = 12 * 8  # 8 years
-    times[:] = np.arange(0, num_months)  # Time index from 0 to 119
+    times[:] = np.arange(0, num_months)  # Time index from 0 to 95
     
     # Copy temperatures in chunks to avoid memory overload
     for i in range(num_months):

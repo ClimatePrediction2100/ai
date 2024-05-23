@@ -22,11 +22,12 @@ def predict(predict_data, args):
     initialize_netcdf_with_historical_data(source_file_path=source_file_path, new_file_path=new_file_path)
     print("Making predictions")
     
+    # input dimension is 6, 5 features and 1 target
     model = LSTMModel(input_dim=6, hidden_dim=100, num_layers=2)
     model.to(config.DEVICE)
     model.load_state_dict(torch.load("lstm_2_100_0.001_huber_4096_48.pt", map_location=config.DEVICE))
     model.eval()
-    predict_and_update_nc_monthly(model, new_file_path, config.DEVICE, predict_data, start_year=2024, end_year=2049)
+    predict_and_update_nc_monthly(model, new_file_path, config.DEVICE, predict_data, start_year=2024, end_year=2025)
     
 
 def main():
