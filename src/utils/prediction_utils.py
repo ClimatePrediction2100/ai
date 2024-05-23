@@ -84,7 +84,7 @@ def predict_and_update_nc_monthly(model, nc_dataset_path, device, predict_data_d
     nc_file = nc.Dataset(nc_dataset_path, 'r+')
 
     model.eval()
-    time_idx = 0  # Initialize time index
+    time_idx = 96  # Initialize time index
 
     for year in range(start_year, end_year + 1):
         for month in range(12):
