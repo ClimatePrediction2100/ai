@@ -6,7 +6,6 @@ import os
 import config
 import csv
 
-from src.utils.training_utils import train_model
 from src.utils.evaluation_utils import evaluate_model
 from src.data.data_loader import load_data  # Assuming data_loader is a function in this module
 from src.data.dataset import *
