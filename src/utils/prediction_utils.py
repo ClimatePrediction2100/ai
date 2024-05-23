@@ -1,9 +1,10 @@
 import torch
-import numpy as np
 import netCDF4 as nc
+import numpy as np
+from tqdm import tqdm
 
 def initialize_netcdf_with_historical_data(source_file_path, new_file_path):
-    # Load source netCDF with historical temperature data
+    # Open source netCDF with historical temperature data
     source_nc = nc.Dataset(source_file_path, 'r')
 
     # Create a new netCDF file
@@ -15,29 +16,39 @@ def initialize_netcdf_with_historical_data(source_file_path, new_file_path):
     times = new_nc.createVariable('time', 'i4', ('time',))
     latitudes = new_nc.createVariable('latitude', 'f4', ('latitude',))
     longitudes = new_nc.createVariable('longitude', 'f4', ('longitude',))
+    # After creating the temperature variable
     temperatures = new_nc.createVariable('temperature', 'f4', ('time', 'latitude', 'longitude'))
+    temperatures.units = 'degree Celsius'
+    temperatures.valid_min = np.float32(-100.0)  # Example minimum, adjust as necessary
+    temperatures.valid_max = np.float32(100.0)   # Example maximum, adjust as necessary
     
-    # Copy data for latitudes and longitudes
+    # Ensure dimensions match, especially for slicing operations
+    assert source_nc.variables['latitude'][:].shape[0] == 180
+    assert source_nc.variables['longitude'][:].shape[0] == 360
+    
     latitudes[:] = source_nc.variables['latitude'][:]
     longitudes[:] = source_nc.variables['longitude'][:]
+
+    # Assuming the original file starts from 2015 and each month is sequentially stored
+    num_months = 12 * 8  # 8 years
+    times[:] = np.arange(0, num_months)  # Time index from 0 to 119
     
-    # Load the first 9 years of temperature data (2015-2023)
-    # The original file starts from 1850 and each month is sequentially stored
-    start_index = 1980 # 2015
-    end_index = 12 * 9  # 9 years
-    historical_temperatures = source_nc.variables['temperature'][start_index:end_index, :, :]
-    times[:] = np.arange(0, end_index)  # Time index from 0 to 119
-    temperatures[:, :, :] = historical_temperatures
-    
+    # Copy temperatures in chunks to avoid memory overload
+    for i in range(num_months):
+        temperatures[i, :, :] = source_nc.variables['temperature'][1980 + i, :, :]
+
+    temperatures.units = 'degree Celsius'
     latitudes.units = 'degree north'
     longitudes.units = 'degree east'
     times.units = 'months since 2015-01'
-    temperatures.units = 'degree Celsius'
-    
-    source_nc.close()
-    return new_nc
 
-def get_input_data(year, month, lat_index, lon_index, data_dict, nc_file, seq_length=12):
+    new_nc.sync()  # Make sure the data is written to the file
+    source_nc.close()
+    new_nc.close()
+    
+    return new_file_path  # Return the path for the new file
+
+def get_input_data(year, month, lat_index, lon_index, data_dict, nc_file, seq_length=48):
     lat = data_dict['land_mask']['latitude'].values[lat_index]
     lon = data_dict['land_mask']['longitude'].values[lon_index]
     
@@ -66,30 +77,33 @@ def get_input_data(year, month, lat_index, lon_index, data_dict, nc_file, seq_le
 
     return x_concat
     
+from tqdm import tqdm
 
-def predict_and_update_nc_monthly(model, nc_file, device, predict_data_dict, start_year=2024, end_year=2150):
+def predict_and_update_nc_monthly(model, nc_dataset_path, device, predict_data_dict, start_year=2024, end_year=2150):
+    # Open the netCDF dataset
+    nc_file = nc.Dataset(nc_dataset_path, 'r+')
+
     model.eval()
-    time_idx = 0  # Index to track time dimension in netCDF
+    time_idx = 0  # Initialize time index
 
     for year in range(start_year, end_year + 1):
-        for month in range(12):  # For each month
-            monthly_predictions = np.zeros((180, 360))  # Placeholder for one month's grid predictions
-            
-            for lat in range(180):
-                for lon in range(360):
-                    # Assume 'get_input_data' fetches or generates the required input for prediction
+        for month in range(12):
+            monthly_predictions = np.zeros((180, 360))
+            # Use tqdm in the outer loop for latitude
+            for lat in tqdm(range(180), desc=f"Processing Year {year}, Month {month}"):
+                # Nested tqdm for longitude, you can also remove this if it's too verbose
+                for lon in tqdm(range(360), desc="Longitude", leave=False):
                     input_data = get_input_data(year, month, lat, lon, predict_data_dict, nc_file)
                     input_tensor = torch.tensor(input_data, dtype=torch.float32).unsqueeze(0).to(device)
                     
                     with torch.no_grad():
-                        predicted_temp = model(input_tensor).item()  # Assuming the model outputs a single temperature value
+                        predicted_temp = model(input_tensor).item()
                     monthly_predictions[lat, lon] = predicted_temp
-            
+
             # Update the netCDF file with the predictions for this month
             nc_file.variables['temperature'][time_idx, :, :] = monthly_predictions
-            nc_file.variables['time'][time_idx] = year * 12 + month  # Example time indexing
+            nc_file.variables['time'][time_idx] = year * 12 + month  # Update time index based on year and month
             time_idx += 1
-            
             nc_file.sync()  # Ensure data is written to disk
 
-    nc_file.close()  # Close the file when done
+    nc_file.close()
