@@ -2,6 +2,7 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 import numpy as np
+from src.data.dataset import *
 from matplotlib import pyplot as plt
 
 def evaluate_model(model, test_loader, device, plot=False, criterion=nn.MSELoss()):
@@ -45,3 +46,19 @@ def evaluate_model(model, test_loader, device, plot=False, criterion=nn.MSELoss(
         plt.show()
     
     return avg_test_loss, actual_mean, predicted_mean
+
+def evaluate(test_data, args, model):
+    print("Evaluating the model")
+    
+    test_dataset = TestData(test_data, args.seq_length)
+    test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=args.batch_size, shuffle=False, num_workers=config.NUM_WORKERS)
+    
+    if args.loss == "mse":
+        criterion = nn.MSELoss()
+    elif args.loss == "mae":
+        criterion = nn.L1Loss()
+    elif args.loss == "huber":
+        criterion = nn.HuberLoss()
+    
+    avg_loss, actual_mean, predicted_mean = evaluate_model(model, test_loader, args.device, plot=False, criterion=criterion)
+  
