@@ -127,69 +127,6 @@ def denormalize_temperature(nparray):
     
     return nparray
 
-# def predict_and_update_nc_monthly(model, predict_loader, device, nc_file, start_year=2024, end_year=2150):
-#     model.eval()  # Set the model to evaluation mode
-#     time_idx = 108  # Initialize time index based on the expected start
-    
-#     # Total months is determined from the DataLoader's dataset length, assuming each batch corresponds to one month.
-#     progress_bar = tqdm(total=len(predict_loader), desc='Overall Progress')
-
-#     # Iterate through each batch provided by DataLoader
-#     for data, lat_idx, lon_idx, target_time_idx in predict_loader:
-#         input_tensor = data.to(device)  # Move the data to the appropriate device (GPU or CPU)
-
-#         with torch.no_grad():
-#             output = model(input_tensor)
-#             if output.shape != (180, 360):
-#                 raise ValueError(f"Model output shape mismatch, expected (180, 360), got {output.shape}")
-#             output = output.view(180, 360)  # Ensure the output is correctly reshaped
-
-#         # Update the netCDF file with the predictions for this batch
-#         nc_file.variables['temperature'][time_idx, :, :] = denormalize_temperature(output.cpu().numpy())
-#         nc_file.variables['time'][time_idx] = target_time_idx  # Use the target time index directly from the batch
-#         time_idx += 1
-#         nc_file.sync()  # Ensure data is written to disk
-
-#         # Update the progress bar after each batch
-#         progress_bar.update(1)
-
-#     progress_bar.close()
-#     nc_file.close()
-    
-
-# def predict_and_update_nc_monthly(model, predict_dataset, device, nc_file, start_year=2024, end_year=2150):
-#     model.eval()  # Set the model to evaluation mode
-#     start_time_idx = 108  # Initialize time index based on the expected start
-#     end_time_idx = 108 + (end_year - start_year + 1) * 12  # Calculate the expected end time index
-    
-#     progress_bar = tqdm(total=end_time_idx - start_time_idx, desc='Overall Progress')
-
-#     for month_idx in range(start_time_idx, end_time_idx):
-#         dimension = 180 * 360
-#         batch_data = []
-#         for i in range(dimension):
-#             data_point = predict_dataset[month_idx * dimension + i]
-#             batch_data.append(data_point)
-
-#         # Convert batch data to tensor and add batch dimension
-#         input_tensor = torch.stack(batch_data).to(device)
-        
-#         with torch.no_grad():
-#             output = model(input_tensor.unsqueeze(0))
-#             if output.shape != (1, 180, 360):
-#                 raise ValueError(f"Model output shape mismatch, expected (1, 180, 360), got {output.shape}")
-#             output = output.squeeze(0)  # Remove batch dimension if necessary
-
-#         # Update the netCDF file with the predictions for this batch
-#         nc_file.variables['temperature'][month_idx, :, :] = denormalize_temperature(output.cpu().numpy())
-#         nc_file.variables['time'][month_idx] = month_idx  # Set time variable correctly
-#         nc_file.sync()  # Ensure data is written to disk
-
-#         progress_bar.update(1)
-
-#     progress_bar.close()
-#     nc_file.close()
-    
 
 def initialize_model(weight_path, feature_dim):
     # Parse model type and parameters from the weight filename
@@ -219,7 +156,12 @@ def initialize_model(weight_path, feature_dim):
     model.eval()
     return model
 
-def predict(predict_data, new_file_path, weight_path, start_year=2024, end_year=2150):
+def predict(predict_data, args):
+    new_file_path = args.save_path
+    weight_path = args.weight_path
+    start_year = args.start_year
+    end_year = args.end_year
+    
     # Initialize netCDF with historical data
     source_file_path = "data/raw/globalTemperature/Land_and_Ocean_LatLong1.nc"
     initialize_netcdf_with_historical_data(source_file_path=source_file_path, new_file_path=new_file_path)
