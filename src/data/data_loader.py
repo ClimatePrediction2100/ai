@@ -6,6 +6,7 @@ from config import ROOT_DIR
 
 temperature_path = os.path.join(ROOT_DIR, 'data', 'raw', 'globalTemperature', 'Land_and_Ocean_LatLong1.nc')
 co2_path = os.path.join(ROOT_DIR, 'data', 'raw', 'globalGhgEmissions', 'CO2_1deg_month_1850-2013.nc')
+simulation_path = os.path.join(ROOT_DIR, 'results', 'globalGhgEmissions', 'CO2_SSP119_2015_2150.nc')
 
 # ssp_scenario = 'SSP119', 'SSP126', 'SSP245', 'SSP370', 'SSP434', 'SSP460', 'SSP534', 'SSP585'
 def load_data(ssp_scenario='SSP119'):

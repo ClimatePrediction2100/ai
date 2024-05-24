@@ -6,3 +6,4 @@ expr:
 setup:
 	@pip install -r requirements.txt
 	@mkdir -p results/models
+	@mkdir -p results/globalTemperature
