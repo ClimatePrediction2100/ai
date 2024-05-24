@@ -1,36 +1,14 @@
 import os
 import sys
 import argparse
-import csv
-
-import torch
-import torch.nn as nn
-from torch.utils.data import Dataset, DataLoader
 
 # Now import other modules that rely on this root directory
 import config
 from src.data.data_loader import load_data  # Assuming data_loader is a function in this module
-from src.data.dataset import *
-from src.utils.training_utils import *
-from src.utils.evaluation_utils import *
-from src.utils.prediction_utils import *
+from src.utils.training_utils import train, expr
+from src.utils.evaluation_utils import evaluate
+from src.utils.prediction_utils import predict
 
-
-def predict(predict_data, args):
-    source_file_path = "data/raw/globalTemperature/Land_and_Ocean_LatLong1.nc"
-    new_file_path = "results/globalTemperature/temperature.nc"
-    initialize_netcdf_with_historical_data(source_file_path=source_file_path, new_file_path=new_file_path)
-    print("Making predictions")
-    
-    # input dimension is 6, 5 features and 1 target
-    model = LSTMModel(input_dim=6, hidden_dim=100, num_layers=2)
-    model.to(config.DEVICE)
-    weight_path = "lstm_2_100_0.001_huber_4096_48.pt"
-    seq_length = 48
-    model.load_state_dict(torch.load(weight_path, map_location=config.DEVICE))
-    model.eval()
-    predict_and_update_nc_monthly(model, new_file_path, config.DEVICE, predict_data, seq_length, start_year=2024, end_year=2024)
-    
 
 def main():
     parser = argparse.ArgumentParser(description="Run ML tasks such as training, evaluating, or predicting.")
@@ -62,7 +40,11 @@ def main():
     elif args.task == "evaluate":
         evaluate()
     elif args.task == "predict":
-        predict(predict_data, args)
+        predict(predict_data,
+                new_file_path="results/globalTemperature/predictions.nc",
+                weight_path="lstm_2_100_0.001_huber_4096_48.pt",
+                start_year=2024,
+                end_year=2150)
     else:
         print("Invalid task. Please choose from 'train', 'evaluate', 'expr' or 'predict'.")
 
