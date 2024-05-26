@@ -112,7 +112,7 @@ def predict_and_update_nc_monthly(model, nc_dataset_path, device, predict_data_d
 
             # Update the netCDF file with the predictions for this month
             nc_file.variables['temperature'][time_idx, :, :] = monthly_predictions
-            nc_file.variables['time'][time_idx] = 9 * 12 + month  # Update time index based on year and month
+            nc_file.variables['time'][time_idx] = time_idx  # Update time index based on year and month
             time_idx += 1
             nc_file.sync()  # Ensure data is written to disk
     
