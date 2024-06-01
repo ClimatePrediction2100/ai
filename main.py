@@ -1,5 +1,3 @@
-import os
-import sys
 import argparse
 
 # Now import other modules that rely on this root directory
@@ -42,7 +40,7 @@ def main():
     train_data, test_data, predict_data = load_data(args.ssp)
 
     if args.task == "train":
-        train = train(train_data, test_data, args)
+        train(train_data, test_data, args)
     elif args.task == "expr":
         expr(train_data, test_data, args)
     elif args.task == "evaluate":
