@@ -25,7 +25,7 @@ def main():
     # predict arguments    
     parser.add_argument("--ssp", type=str, default="SSP119", help="Shared Socioeconomic Pathway, 'SSP119', 'SSP126', 'SSP245', 'SSP370', 'SSP434', 'SSP460', 'SSP534', 'SSP585'")
     parser.add_argument("--save_path", type=str, default="results/globalTemperature/predictions.nc", help="Path to save the prediction results")
-    parser.add_argument("--weight_path", type=str, default="results/models/lstm_2_100_0.01_mse_4096_1.pt", help="Path to the trained model weights")
+    parser.add_argument("--weight_path", type=str, default="results/model_weights/models/lstm_2_100_0.01_mse_4096_1.pt", help="Path to the trained model weights")
     parser.add_argument("--start_year", type=int, default=2024, help="Start year for prediction")
     parser.add_argument("--end_year", type=int, default=2150, help="End year for prediction")
     

@@ -14,6 +14,7 @@ setup:
 	@mkdir -p data/raw/globalGhgEmissions
 
 # https://berkeleyearth.org/data/
+# https://zenodo.org/records/5021361
 
 download_data:
 	wget -O data/raw/globalTemperature/Land_and_Ocean_LatLong1.nc https://berkeley-earth-temperature.s3.us-west-1.amazonaws.com/Global/Gridded/Land_and_Ocean_LatLong1.nc
@@ -28,5 +29,9 @@ download_data:
 	wget -O data/raw/globalGhgEmissions/CO2_SSP585_2015_2150.nc https://zenodo.org/records/5021361/files/CO2_SSP585_2015_2150.nc?download=1
 
 download_weights:
+	# wget -O results/weights.tar.gz https://github.com/ClimatePrediction2100/data/releases/download/torchmodel/model_weights.tar.gz
+	tar -zxvf results/weights.tar.gz -C results
 
 download_results:
+	wget -O results/netcdf.tar.gz https://github.com/ClimatePrediction2100/data/releases/download/netCDF4/results_by_ssp.tar.gz
+	tar -zxvf results/netcdf.tar.gz -C results
