@@ -1,4 +1,4 @@
-.PHONY: expr setup
+.PHONY: expr setup download_data download_weights download_results
 
 expr:
 	@bash expr.sh
