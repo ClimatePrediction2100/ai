@@ -17,33 +17,9 @@ LOSS = 'mse'
 PATIENCE = 10
 SEQUENCE_LENGTH = 12
 
-# Save results
-expr_name = 'experiment_1'
-
-
-# Logging settings
-LOGGING_CONFIG = {
-    'version': 1,
-    'handlers': {
-        'stream_handler': {
-            'class': 'logging.StreamHandler',
-            'level': 'INFO',
-            'formatter': 'detailed',
-        },
-    },
-    'formatters': {
-        'detailed': {
-            'format': '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-        },
-    },
-    'loggers': {
-        'my_logger': {
-            'handlers': ['stream_handler'],
-            'level': 'INFO',
-            'propagate': False,
-        },
-    }
-}
+DATA_DIR = os.path.join(ROOT_DIR, 'data')
+MODEL_DIR = os.path.join(DATA_DIR, 'models')
+OUTPUT_DIR = os.path.join(ROOT_DIR, 'results', 'globalTemperature')
 
 # Function to ensure all directories exist
 def create_dirs():
