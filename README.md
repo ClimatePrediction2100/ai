@@ -1,7 +1,7 @@
 # AI: Predicting Global Temperature Change Using Neural Networks
 
 ### Code Description
-[Link to Tutorial](tutorial.md)
+[Link to Tutorial](Tutorial.md)
 
 
 ## Introduction
